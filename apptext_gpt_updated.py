@@ -1,3 +1,5 @@
+#importing necessary libraries
+
 from fastapi import FastAPI, HTTPException, Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -6,7 +8,6 @@ from flask import Flask, request, jsonify
 from langchain.embeddings.openai import OpenAIEmbeddings
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
@@ -27,6 +28,7 @@ import time
 request_data = []
 last_request_time = None
 
+#function to set timer for 30 seconds(to overcome OpenAI limitation)
 def make_request_time(data):
     global last_request_time, request_data
     print(f'\nLast Request Time is {last_request_time}.')
@@ -49,25 +51,28 @@ def make_request_time(data):
         last_request_time = time.time()
     print(f'Updated last request time is {last_request_time}.\n')
 
+#function to correct spelling errors in query if any.
 def correct_spelling(text):
     blob = TextBlob(text)
     corrected_text = str(blob.correct())
     return corrected_text
 
+#function to tackle unkown queries
 def checking_response(response):
     if "i don't know" in response.lower():
         return "The information you need doesn't appear to be in the International arrival guide. If you believe this inquiry is valid, please email to internationalquery@umbc.edu. One of our student counselors will repond to your query with 2-3 business days."
     return response
 
+#query function
 def chat(query):
     query = correct_spelling(query)
     make_request_time(query)
-    pdf_reader = PdfReader(r'D:\UMBC ANIL\Fall 2023\DATA 690 NLP\Chatbot project\Project\UMBC_International.pdf')
+    pdf_reader = PdfReader(r'D:\UMBC ANIL\Fall 2023\DATA 690 NLP\Chatbot project\Project\UMBC_International.pdf') #text corpus
     text = ""
     for page in pdf_reader.pages:
         text += page.extract_text()
 
-    # split into chunks
+    # splitting the text into chunks
     char_text_splitter = CharacterTextSplitter(separator="\n", chunk_size=500,
                                                chunk_overlap=10, length_function=len)
 
