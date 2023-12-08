@@ -12,7 +12,7 @@ from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import os
 from PyPDF2 import PdfReader
 from textblob import TextBlob
@@ -78,7 +78,7 @@ def chat(query):
 
     text_chunks = char_text_splitter.split_text(text)
 
-    api_key = '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'
+    api_key = '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'
     embeddings = OpenAIEmbeddings(openai_api_key=api_key)
 
     docsearch = FAISS.from_texts(text_chunks, embeddings)
